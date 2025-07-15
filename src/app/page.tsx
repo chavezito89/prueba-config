@@ -38,38 +38,13 @@ const ToothIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const initialClinicInfo: ClinicInfo = {
   logoUrl: "",
-  name: "Sonrisa Perfecta",
-  address: "Av. Siempre Viva 123, Springfield",
-  phone: "555-123-4567",
-  email: "contacto@sonrisaperfecta.com",
+  name: "",
+  address: "",
+  phone: "",
+  email: "",
 };
 
-const initialDoctors: Doctor[] = [
-  {
-    id: "1",
-    name: "Dr. Juan Pérez",
-    university: "UNAM",
-    professionalId: "123456",
-    specialty: "Ortodoncia",
-    specialtyId: "654321",
-    phone: "555-987-6543",
-    email: "juan.perez@doctores.com",
-    signatureUrl: "",
-    type: "in-house",
-    avatarUrl: `https://i.pravatar.cc/150?u=1`,
-  },
-  {
-    id: "2",
-    name: "Dra. María García",
-    university: "UdeG",
-    professionalId: "789012",
-    phone: "555-456-7890",
-    email: "maria.garcia@doctores.com",
-    signatureUrl: "",
-    type: "external",
-    avatarUrl: `https://i.pravatar.cc/150?u=2`,
-  },
-];
+const initialDoctors: Doctor[] = [];
 
 export default function DentalConfigPage() {
   const [activeView, setActiveView] = React.useState("clinic");
