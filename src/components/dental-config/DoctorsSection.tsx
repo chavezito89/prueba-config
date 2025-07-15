@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { Doctor } from "@/lib/types";
-import { Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail, Eraser } from "lucide-react";
+import { Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail, Eraser, Upload } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface DoctorsSectionProps {
@@ -47,7 +47,7 @@ interface DoctorsSectionProps {
   setDoctors: React.Dispatch<React.SetStateAction<Doctor[]>>;
 }
 
-const emptyDoctor: Omit<Doctor, "id" | "avatarUrl"> = {
+const emptyDoctor: Omit<Doctor, "id"> = {
   name: "",
   university: "",
   professionalId: "",
@@ -56,6 +56,7 @@ const emptyDoctor: Omit<Doctor, "id" | "avatarUrl"> = {
   phone: "",
   email: "",
   signatureUrl: "",
+  avatarUrl: "",
   type: "in-house",
 };
 
@@ -64,6 +65,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [newDoctor, setNewDoctor] = React.useState(emptyDoctor);
   const sigCanvas = React.useRef<SignatureCanvas>(null);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
 
   const inHouseDoctors = doctors.filter((d) => d.type === "in-house");
   const externalDoctors = doctors.filter((d) => d.type === "external");
@@ -73,6 +75,17 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
     setNewDoctor((prev) => ({ ...prev, [id]: value }));
   };
   
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewDoctor((prev) => ({ ...prev, avatarUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const clearSignature = () => {
     sigCanvas.current?.clear();
     setNewDoctor(prev => ({ ...prev, signatureUrl: "" }));
@@ -96,31 +109,21 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
 
   const handleAddDoctor = (e: React.FormEvent) => {
     e.preventDefault();
+    let doctorToAdd: Doctor = { ...newDoctor, id: (doctors.length + 1).toString() };
+
      if (sigCanvas.current && !sigCanvas.current.isEmpty()) {
       const signatureDataUrl = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
-      const newId = (doctors.length + 1).toString();
-      const doctorToAdd: Doctor = { ...newDoctor, id: newId, signatureUrl: signatureDataUrl };
-      
-      setDoctors((prev) => [...prev, doctorToAdd]);
-      toast({
-        title: "Doctor Agregado",
-        description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
-        className: "bg-green-500 text-white",
-      });
-      resetForm();
-      setIsSheetOpen(false);
-    } else {
-       const newId = (doctors.length + 1).toString();
-       const doctorToAdd: Doctor = { ...newDoctor, id: newId };
-       setDoctors((prev) => [...prev, doctorToAdd]);
-        toast({
-            title: "Doctor Agregado",
-            description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
-            className: "bg-green-500 text-white",
-        });
-        resetForm();
-        setIsSheetOpen(false);
+      doctorToAdd.signatureUrl = signatureDataUrl;
     }
+      
+    setDoctors((prev) => [...prev, doctorToAdd]);
+    toast({
+      title: "Doctor Agregado",
+      description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
+      className: "bg-green-500 text-white",
+    });
+    resetForm();
+    setIsSheetOpen(false);
   };
 
   const handleDeleteDoctor = (id: string) => {
@@ -141,6 +144,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
             <AccordionTrigger className="hover:no-underline hover:bg-secondary/50 px-4 py-2 rounded-t-lg text-left">
               <div className="flex items-center gap-4 w-full">
                 <Avatar className="h-12 w-12 border">
+                  {doctor.avatarUrl && <AvatarImage src={doctor.avatarUrl} alt={doctor.name} />}
                   <AvatarFallback>{doctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-left">
@@ -204,6 +208,31 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
                 </SheetDescription>
               </SheetHeader>
               <div className="py-6 space-y-4 max-h-[80vh] overflow-y-auto pr-4">
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <Label className="font-semibold">Foto de Perfil</Label>
+                  <Avatar
+                    className="w-24 h-24 border-2 border-dashed cursor-pointer hover:border-primary transition-colors group"
+                    onClick={() => avatarInputRef.current?.click()}
+                  >
+                    {newDoctor.avatarUrl ? (
+                       <AvatarImage src={newDoctor.avatarUrl} alt="Avatar Preview" />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-secondary/50">
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-xs mt-1">Subir foto</span>
+                      </div>
+                    )}
+                    <AvatarFallback>{newDoctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <input
+                    type="file"
+                    ref={avatarInputRef}
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                    accept="image/*"
+                  />
+                </div>
+
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nombre Completo</Label>
                   <Input id="name" value={newDoctor.name} onChange={handleInputChange} required />
