@@ -14,17 +14,13 @@ const ToothIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    fill="currentColor"
     {...props}
   >
-    <path d="M9.36,4.25a2.1,2.1,0,0,1,2.1-2.1h1.08a2.1,2.1,0,0,1,2.1,2.1V5.59a.5.5,0,0,1-.5.5h-4.3A.5.5,0,0,1,9.36,5.59Z" />
-    <path d="M9.36,19.25a.5.5,0,0,0,.5.5h4.3a.5.5,0,0,0,.5-.5v-6.2a1,1,0,0,1,1-1h1.25a2.1,2.1,0,0,0,2.1-2.1V7.36a2.1,2.1,0,0,0-2.1-2.1H7.11a2.1,2.1,0,0,0-2.1,2.1v2.1a2.1,2.1,0,0,0,2.1,2.1H8.36a1,1,0,0,1,1,1Z" />
+    <path d="M19.95,9.58C19.86,8.8,19.2,8.23,18.43,8.23H17.2V6.32C17.2,4.49,15.71,3,13.88,3H10.12C8.29,3,6.8,4.49,6.8,6.32V8.23H5.57C4.8,8.23,4.14,8.8,4.05,9.58L3,21H21L19.95,9.58ZM8.4,6.32C8.4,5.38,9.17,4.6,10.12,4.6H13.88C14.83,4.6,15.6,5.38,15.6,6.32V8.23H8.4V6.32Z" />
   </svg>
 );
+
 
 const initialClinicInfo: ClinicInfo = {
   logoUrl: "",
