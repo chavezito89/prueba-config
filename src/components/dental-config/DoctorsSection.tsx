@@ -76,8 +76,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
   const handleAddDoctor = (e: React.FormEvent) => {
     e.preventDefault();
     const newId = (doctors.length + 1).toString();
-    const newAvatar = `https://i.pravatar.cc/150?u=${newId}`;
-    const doctorToAdd: Doctor = { ...newDoctor, id: newId, avatarUrl: newAvatar };
+    const doctorToAdd: Doctor = { ...newDoctor, id: newId };
     
     setDoctors((prev) => [...prev, doctorToAdd]);
     toast({
@@ -104,21 +103,21 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
       <Accordion type="single" collapsible className="w-full space-y-2">
         {list.map((doctor) => (
           <AccordionItem value={doctor.id} key={doctor.id} className="border rounded-lg bg-card shadow-sm">
-            <AccordionTrigger className="hover:bg-secondary/50 px-4 rounded-lg text-left">
+            <AccordionTrigger className="hover:no-underline hover:bg-secondary/50 px-4 py-2 rounded-t-lg text-left">
               <div className="flex items-center gap-4 w-full">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={doctor.avatarUrl} alt={doctor.name} />
-                  <AvatarFallback>{doctor.name.charAt(0)}</AvatarFallback>
+                <Avatar className="h-12 w-12 border">
+                  {doctor.avatarUrl && <AvatarImage src={doctor.avatarUrl} alt={doctor.name} />}
+                  <AvatarFallback>{doctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
+                <div className="flex-1 text-left">
                   <p className="font-semibold text-base text-foreground">{doctor.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground underline">
                     {doctor.specialty || "General"}
                   </p>
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="p-6 bg-secondary/20 rounded-b-lg">
+            <AccordionContent className="p-6 bg-secondary/20 rounded-b-lg border-t">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
                 <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /><strong>Cédula Prof:</strong> {doctor.professionalId}</p>
                 {doctor.specialtyId && <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /><strong>Cédula Esp:</strong> {doctor.specialtyId}</p>}
@@ -143,7 +142,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between border-b p-4">
         <div>
           <CardTitle>Plantilla de Doctores</CardTitle>
           <CardDescription>
@@ -226,16 +225,16 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
           </SheetContent>
         </Sheet>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <Tabs defaultValue="in-house" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="in-house">Doctores de Planta ({inHouseDoctors.length})</TabsTrigger>
-            <TabsTrigger value="external">Doctores Externos ({externalDoctors.length})</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 rounded-none h-12">
+            <TabsTrigger value="in-house" className="rounded-none text-base">Doctores de Planta ({inHouseDoctors.length})</TabsTrigger>
+            <TabsTrigger value="external" className="rounded-none text-base">Doctores Externos ({externalDoctors.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="in-house" className="mt-6">
+          <TabsContent value="in-house" className="mt-6 p-4 md:p-6">
             <DoctorList list={inHouseDoctors} />
           </TabsContent>
-          <TabsContent value="external" className="mt-6">
+          <TabsContent value="external" className="mt-6 p-4 md:p-6">
             <DoctorList list={externalDoctors} />
           </TabsContent>
         </Tabs>
