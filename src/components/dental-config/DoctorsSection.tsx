@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
   Accordion,
   AccordionContent,
@@ -36,7 +37,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { Doctor } from "@/lib/types";
-import { PlusCircle, Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail } from "lucide-react";
+import { PlusCircle, Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail, Upload } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface DoctorsSectionProps {
@@ -60,6 +61,8 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
   const { toast } = useToast();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [newDoctor, setNewDoctor] = React.useState(emptyDoctor);
+  const [signaturePreview, setSignaturePreview] = React.useState<string | null>(null);
+  const signatureFileInputRef = React.useRef<HTMLInputElement>(null);
 
   const inHouseDoctors = doctors.filter((d) => d.type === "in-house");
   const externalDoctors = doctors.filter((d) => d.type === "external");
@@ -68,6 +71,24 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
     const { id, value } = e.target;
     setNewDoctor((prev) => ({ ...prev, [id]: value }));
   };
+  
+  const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setSignaturePreview(result);
+        setNewDoctor((prev) => ({ ...prev, signatureUrl: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const resetForm = () => {
+    setNewDoctor(emptyDoctor);
+    setSignaturePreview(null);
+  }
 
   const handleRadioChange = (value: 'in-house' | 'external') => {
     setNewDoctor(prev => ({ ...prev, type: value }));
@@ -84,7 +105,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
       description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
       className: "bg-green-500 text-white",
     });
-    setNewDoctor(emptyDoctor);
+    resetForm();
     setIsSheetOpen(false);
   };
 
@@ -106,7 +127,6 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
             <AccordionTrigger className="hover:no-underline hover:bg-secondary/50 px-4 py-2 rounded-t-lg text-left">
               <div className="flex items-center gap-4 w-full">
                 <Avatar className="h-12 w-12 border">
-                  {doctor.avatarUrl && <AvatarImage src={doctor.avatarUrl} alt={doctor.name} />}
                   <AvatarFallback>{doctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-left">
@@ -210,14 +230,39 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
                   </div>
                 </div>
                  <div className="grid gap-2">
-                    <Label htmlFor="signatureUrl">Firma del Doctor (URL)</Label>
-                    <Input id="signatureUrl" placeholder="https://..." value={newDoctor.signatureUrl || ""} onChange={handleInputChange} />
-                    <p className="text-xs text-muted-foreground">Por ahora, ingrese una URL. La carga de archivos se habilitará más adelante.</p>
+                    <Label>Firma del Doctor</Label>
+                     <div
+                        className="relative w-full h-32 rounded-md border-2 border-dashed flex items-center justify-center cursor-pointer hover:border-primary transition-colors group bg-secondary/50"
+                        onClick={() => signatureFileInputRef.current?.click()}
+                      >
+                        {signaturePreview ? (
+                          <Image
+                            src={signaturePreview}
+                            alt="Signature Preview"
+                            layout="fill"
+                            objectFit="contain"
+                            className="rounded-md p-2"
+                          />
+                        ) : (
+                          <div className="text-center text-muted-foreground p-4">
+                            <Upload className="mx-auto h-8 w-8 mb-2 text-gray-400" />
+                            <p className="mt-2 text-sm font-medium">Subir firma</p>
+                            <p className="mt-1 text-xs">PNG transparente recomendado</p>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          ref={signatureFileInputRef}
+                          onChange={handleSignatureChange}
+                          className="hidden"
+                          accept="image/*"
+                        />
+                      </div>
                 </div>
               </div>
               <SheetFooter className="pt-4">
                 <SheetClose asChild>
-                  <Button type="button" variant="outline">Cancelar</Button>
+                  <Button type="button" variant="outline" onClick={resetForm}>Cancelar</Button>
                 </SheetClose>
                 <Button type="submit"><CheckCircle /> Guardar Doctor</Button>
               </SheetFooter>
