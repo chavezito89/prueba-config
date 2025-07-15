@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import type { ClinicInfo } from "@/lib/types";
-import { Upload } from "lucide-react";
+import { Upload, CheckCircle } from "lucide-react";
 
 interface ClinicInfoFormProps {
   info: ClinicInfo;
@@ -40,7 +40,6 @@ export function ClinicInfoForm({ info, setInfo }: ClinicInfoFormProps) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result as string);
-        // In a real app, you'd upload this file and save the URL
         setInfo((prev) => ({ ...prev, logoUrl: reader.result as string }));
       };
       reader.readAsDataURL(file);
@@ -53,24 +52,25 @@ export function ClinicInfoForm({ info, setInfo }: ClinicInfoFormProps) {
     toast({
       title: "¡Éxito!",
       description: "La información de la clínica se ha guardado correctamente.",
+      className: "bg-green-500 text-white",
     });
   };
 
   return (
-    <Card>
+    <Card className="shadow-lg">
       <form onSubmit={handleSubmit}>
         <CardHeader>
-          <CardTitle>Información de la Clínica</CardTitle>
+          <CardTitle>Perfil de la Clínica</CardTitle>
           <CardDescription>
             Actualiza los detalles de tu clínica. Esta información será visible
             para tus pacientes.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-8 md:grid-cols-3">
-          <div className="flex flex-col items-center gap-4 md:col-span-1">
-            <Label>Logo del Establecimiento</Label>
+        <CardContent className="grid gap-10 md:grid-cols-3">
+          <div className="flex flex-col items-center gap-4 md:col-span-1 pt-2">
+            <Label className="font-semibold">Logo de la Clínica</Label>
             <div
-              className="relative w-40 h-40 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer hover:border-primary transition-colors group"
+              className="relative w-40 h-40 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer hover:border-primary transition-colors group bg-secondary/50"
               onClick={() => fileInputRef.current?.click()}
             >
               {logoPreview ? (
@@ -82,9 +82,10 @@ export function ClinicInfoForm({ info, setInfo }: ClinicInfoFormProps) {
                   className="rounded-full"
                 />
               ) : (
-                <div className="text-center text-muted-foreground">
-                  <Upload className="mx-auto h-8 w-8" />
-                  <p className="mt-2 text-sm">Subir logo</p>
+                <div className="text-center text-muted-foreground p-4">
+                  <Upload className="mx-auto h-10 w-10 mb-2 text-gray-400" />
+                  <p className="mt-2 text-sm font-medium">Subir logo</p>
+                   <p className="mt-1 text-xs">PNG, JPG, SVG</p>
                 </div>
               )}
               <input
@@ -95,11 +96,8 @@ export function ClinicInfoForm({ info, setInfo }: ClinicInfoFormProps) {
                 accept="image/*"
               />
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Click para cambiar. Recomendado: 200x200px.
-            </p>
           </div>
-          <div className="grid gap-4 md:col-span-2">
+          <div className="grid gap-6 md:col-span-2">
             <div className="grid gap-2">
               <Label htmlFor="name">Nombre del establecimiento</Label>
               <Input
@@ -107,6 +105,7 @@ export function ClinicInfoForm({ info, setInfo }: ClinicInfoFormProps) {
                 value={info.name}
                 onChange={handleInputChange}
                 placeholder="Ej: Clínica Dental Sonrisas"
+                className="text-base"
               />
             </div>
             <div className="grid gap-2">
@@ -116,34 +115,40 @@ export function ClinicInfoForm({ info, setInfo }: ClinicInfoFormProps) {
                 value={info.address}
                 onChange={handleInputChange}
                 placeholder="Ej: Calle Falsa 123, Col. Centro"
+                 className="text-base"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="phone">Teléfono</Label>
+                <Label htmlFor="phone">Teléfono de Contacto</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={info.phone}
                   onChange={handleInputChange}
                   placeholder="Ej: 55 1234 5678"
+                   className="text-base"
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Email de Contacto</Label>
                 <Input
                   id="email"
                   type="email"
                   value={info.email}
                   onChange={handleInputChange}
                   placeholder="Ej: contacto@clinica.com"
+                   className="text-base"
                 />
               </div>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="border-t px-6 py-4">
-          <Button type="submit">Guardar Cambios</Button>
+        <CardFooter className="border-t px-6 py-4 bg-secondary/30 flex justify-end">
+          <Button type="submit" size="lg">
+            <CheckCircle />
+            Guardar Cambios
+          </Button>
         </CardFooter>
       </form>
     </Card>

@@ -18,6 +18,8 @@ import { Building, Settings, Users } from "lucide-react";
 import { ClinicInfoForm } from "@/components/dental-config/ClinicInfoForm";
 import { DoctorsSection } from "@/components/dental-config/DoctorsSection";
 import { FutureSettings } from "@/components/dental-config/FutureSettings";
+import { Button } from "@/components/ui/button";
+import { Bell, UserCircle } from "lucide-react";
 
 const ToothIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -50,6 +52,25 @@ export default function DentalConfigPage() {
   const [activeView, setActiveView] = React.useState("clinic");
   const [clinicInfo, setClinicInfo] = React.useState<ClinicInfo>(initialClinicInfo);
   const [doctors, setDoctors] = React.useState<Doctor[]>(initialDoctors);
+  const [pageTitle, setPageTitle] = React.useState("Información de la Clínica");
+
+  React.useEffect(() => {
+    switch (activeView) {
+      case "clinic":
+        setPageTitle("Información de la Clínica");
+        break;
+      case "doctors":
+        setPageTitle("Gestión de Doctores");
+        break;
+      case "other":
+        setPageTitle("Otras Configuraciones");
+        break;
+      default:
+        setPageTitle("Información de la Clínica");
+        break;
+    }
+  }, [activeView]);
+
 
   const renderContent = () => {
     switch (activeView) {
@@ -74,8 +95,8 @@ export default function DentalConfigPage() {
                 <ToothIcon className="h-6 w-6" />
               </div>
               <div className="group-data-[collapsible=icon]:hidden">
-                <h2 className="text-lg font-semibold">DentalConfig</h2>
-                <p className="text-sm text-muted-foreground">Clínica Dental</p>
+                <h2 className="text-lg font-semibold text-foreground">DentalFlow</h2>
+                <p className="text-sm text-muted-foreground">Panel de Control</p>
               </div>
             </div>
           </SidebarHeader>
@@ -115,15 +136,26 @@ export default function DentalConfigPage() {
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-          <header className="flex items-center justify-between p-4 border-b md:justify-end">
-            <SidebarTrigger className="md:hidden" />
-            <h1 className="text-2xl font-semibold md:hidden">
-              DentalConfig
-            </h1>
-            <div />
+          <header className="flex items-center justify-between p-4 border-b h-16 bg-card">
+            <div className="flex items-center gap-4">
+               <SidebarTrigger className="md:hidden" />
+               <h1 className="text-xl font-semibold text-foreground">
+                {pageTitle}
+               </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon">
+                <Bell className="h-5 w-5" />
+                <span className="sr-only">Notificaciones</span>
+              </Button>
+              <Button variant="ghost" size="icon">
+                <UserCircle className="h-6 w-6" />
+                <span className="sr-only">Perfil</span>
+              </Button>
+            </div>
           </header>
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-4xl mx-auto">{renderContent()}</div>
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+            <div className="max-w-5xl mx-auto">{renderContent()}</div>
           </main>
         </SidebarInset>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import {
   Accordion,
   AccordionContent,
@@ -37,7 +36,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { Doctor } from "@/lib/types";
-import { PlusCircle, Trash2, User, UserPlus, Users } from "lucide-react";
+import { PlusCircle, Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface DoctorsSectionProps {
@@ -84,6 +83,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
     toast({
       title: "Doctor Agregado",
       description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
+      className: "bg-green-500 text-white",
     });
     setNewDoctor(emptyDoctor);
     setIsSheetOpen(false);
@@ -101,33 +101,31 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
 
   const DoctorList = ({ list }: { list: Doctor[] }) => (
     list.length > 0 ? (
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full space-y-2">
         {list.map((doctor) => (
-          <AccordionItem value={doctor.id} key={doctor.id}>
-            <AccordionTrigger className="hover:bg-accent/50 px-4 rounded-md">
-              <div className="flex items-center gap-4">
-                <Avatar>
+          <AccordionItem value={doctor.id} key={doctor.id} className="border rounded-lg bg-card shadow-sm">
+            <AccordionTrigger className="hover:bg-secondary/50 px-4 rounded-lg text-left">
+              <div className="flex items-center gap-4 w-full">
+                <Avatar className="h-12 w-12">
                   <AvatarImage src={doctor.avatarUrl} alt={doctor.name} />
                   <AvatarFallback>{doctor.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div>
-                  <p className="font-semibold text-left">{doctor.name}</p>
-                  <p className="text-sm text-muted-foreground text-left">
+                <div className="flex-1">
+                  <p className="font-semibold text-base text-foreground">{doctor.name}</p>
+                  <p className="text-sm text-muted-foreground">
                     {doctor.specialty || "General"}
                   </p>
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="p-4 bg-muted/30 rounded-b-md">
+            <AccordionContent className="p-6 bg-secondary/20 rounded-b-lg">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                <p><strong>Universidad:</strong> {doctor.university}</p>
-                <p><strong>Cédula Profesional:</strong> {doctor.professionalId}</p>
-                {doctor.specialty && <p><strong>Especialidad:</strong> {doctor.specialty}</p>}
-                {doctor.specialtyId && <p><strong>Cédula Especialidad:</strong> {doctor.specialtyId}</p>}
-                <p><strong>Teléfono:</strong> {doctor.phone}</p>
-                <p><strong>Email:</strong> {doctor.email}</p>
-                <div className="sm:col-span-2 flex justify-end">
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteDoctor(doctor.id)}><Trash2 className="mr-2 h-4 w-4"/>Eliminar</Button>
+                <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /><strong>Cédula Prof:</strong> {doctor.professionalId}</p>
+                {doctor.specialtyId && <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /><strong>Cédula Esp:</strong> {doctor.specialtyId}</p>}
+                <p className="flex items-center gap-2"><Phone className="w-4 h-4 text-primary" /><strong>Teléfono:</strong> {doctor.phone}</p>
+                <p className="flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /><strong>Email:</strong> {doctor.email}</p>
+                <div className="sm:col-span-2 flex justify-end pt-4">
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteDoctor(doctor.id)}><Trash2 className="mr-2 h-4 w-4"/>Eliminar Doctor</Button>
                 </div>
               </div>
             </AccordionContent>
@@ -135,41 +133,42 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
         ))}
       </Accordion>
     ) : (
-      <div className="text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg">
-        <Users className="mx-auto h-12 w-12" />
-        <p className="mt-4">No hay doctores en esta categoría.</p>
+      <div className="text-center text-muted-foreground p-12 border-2 border-dashed rounded-lg bg-secondary/30">
+        <Users className="mx-auto h-16 w-16 text-gray-400" />
+        <p className="mt-4 font-medium">No hay doctores en esta categoría.</p>
+        <p className="text-sm mt-1">Agrega un doctor para empezar a gestionar perfiles.</p>
       </div>
     )
   );
 
   return (
-    <Card>
+    <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Doctores</CardTitle>
+          <CardTitle>Plantilla de Doctores</CardTitle>
           <CardDescription>
-            Gestiona los perfiles de los doctores de tu clínica.
+            Gestiona los perfiles de los profesionales de tu clínica.
           </CardDescription>
         </div>
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button><UserPlus className="mr-2 h-4 w-4" /> Agregar Doctor</Button>
+            <Button size="lg"><UserPlus /> Agregar Doctor</Button>
           </SheetTrigger>
           <SheetContent className="sm:max-w-lg w-full">
             <form onSubmit={handleAddDoctor}>
               <SheetHeader>
-                <SheetTitle>Agregar Nuevo Doctor</SheetTitle>
+                <SheetTitle>Agregar Nuevo Profesional</SheetTitle>
                 <SheetDescription>
-                  Completa los datos para registrar un nuevo profesional.
+                  Completa los datos para registrar un nuevo doctor en el sistema.
                 </SheetDescription>
               </SheetHeader>
-              <div className="py-4 space-y-4 max-h-[80vh] overflow-y-auto pr-4">
+              <div className="py-6 space-y-4 max-h-[80vh] overflow-y-auto pr-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nombre Completo</Label>
                   <Input id="name" value={newDoctor.name} onChange={handleInputChange} required />
                 </div>
                  <div className="grid gap-2">
-                  <Label htmlFor="type">Tipo de Doctor</Label>
+                  <Label>Tipo de Doctor</Label>
                    <RadioGroup defaultValue={newDoctor.type} onValueChange={handleRadioChange} className="flex gap-4 pt-2">
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="in-house" id="in-house" />
@@ -177,7 +176,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="external" id="external" />
-                      <Label htmlFor="external">De Fuera</Label>
+                      <Label htmlFor="external">Externo</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -217,11 +216,11 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
                     <p className="text-xs text-muted-foreground">Por ahora, ingrese una URL. La carga de archivos se habilitará más adelante.</p>
                 </div>
               </div>
-              <SheetFooter>
+              <SheetFooter className="pt-4">
                 <SheetClose asChild>
                   <Button type="button" variant="outline">Cancelar</Button>
                 </SheetClose>
-                <Button type="submit">Guardar Doctor</Button>
+                <Button type="submit"><CheckCircle /> Guardar Doctor</Button>
               </SheetFooter>
             </form>
           </SheetContent>
@@ -230,13 +229,13 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
       <CardContent>
         <Tabs defaultValue="in-house" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="in-house">De Planta</TabsTrigger>
-            <TabsTrigger value="external">De Fuera</TabsTrigger>
+            <TabsTrigger value="in-house">Doctores de Planta ({inHouseDoctors.length})</TabsTrigger>
+            <TabsTrigger value="external">Doctores Externos ({externalDoctors.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="in-house" className="mt-4">
+          <TabsContent value="in-house" className="mt-6">
             <DoctorList list={inHouseDoctors} />
           </TabsContent>
-          <TabsContent value="external" className="mt-4">
+          <TabsContent value="external" className="mt-6">
             <DoctorList list={externalDoctors} />
           </TabsContent>
         </Tabs>
