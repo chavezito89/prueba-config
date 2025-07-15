@@ -1,14 +1,16 @@
+
 "use client";
 
 import * as React from "react";
 import Image from "next/image";
+import SignatureCanvas from "react-signature-canvas";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,7 +39,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { Doctor } from "@/lib/types";
-import { PlusCircle, Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail, Upload } from "lucide-react";
+import { Trash2, UserPlus, Users, CheckCircle, Briefcase, Phone, Mail, Eraser } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface DoctorsSectionProps {
@@ -61,8 +63,7 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
   const { toast } = useToast();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [newDoctor, setNewDoctor] = React.useState(emptyDoctor);
-  const [signaturePreview, setSignaturePreview] = React.useState<string | null>(null);
-  const signatureFileInputRef = React.useRef<HTMLInputElement>(null);
+  const sigCanvas = React.useRef<SignatureCanvas>(null);
 
   const inHouseDoctors = doctors.filter((d) => d.type === "in-house");
   const externalDoctors = doctors.filter((d) => d.type === "external");
@@ -72,22 +73,21 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
     setNewDoctor((prev) => ({ ...prev, [id]: value }));
   };
   
-  const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setSignaturePreview(result);
-        setNewDoctor((prev) => ({ ...prev, signatureUrl: result }));
-      };
-      reader.readAsDataURL(file);
+  const clearSignature = () => {
+    sigCanvas.current?.clear();
+    setNewDoctor(prev => ({ ...prev, signatureUrl: "" }));
+  }
+
+  const handleSaveSignature = () => {
+    if (sigCanvas.current) {
+      const signatureDataUrl = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+      setNewDoctor(prev => ({ ...prev, signatureUrl: signatureDataUrl }));
     }
-  };
+  }
 
   const resetForm = () => {
     setNewDoctor(emptyDoctor);
-    setSignaturePreview(null);
+    sigCanvas.current?.clear();
   }
 
   const handleRadioChange = (value: 'in-house' | 'external') => {
@@ -96,17 +96,31 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
 
   const handleAddDoctor = (e: React.FormEvent) => {
     e.preventDefault();
-    const newId = (doctors.length + 1).toString();
-    const doctorToAdd: Doctor = { ...newDoctor, id: newId };
-    
-    setDoctors((prev) => [...prev, doctorToAdd]);
-    toast({
-      title: "Doctor Agregado",
-      description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
-      className: "bg-green-500 text-white",
-    });
-    resetForm();
-    setIsSheetOpen(false);
+     if (sigCanvas.current && !sigCanvas.current.isEmpty()) {
+      const signatureDataUrl = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+      const newId = (doctors.length + 1).toString();
+      const doctorToAdd: Doctor = { ...newDoctor, id: newId, signatureUrl: signatureDataUrl };
+      
+      setDoctors((prev) => [...prev, doctorToAdd]);
+      toast({
+        title: "Doctor Agregado",
+        description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
+        className: "bg-green-500 text-white",
+      });
+      resetForm();
+      setIsSheetOpen(false);
+    } else {
+       const newId = (doctors.length + 1).toString();
+       const doctorToAdd: Doctor = { ...newDoctor, id: newId };
+       setDoctors((prev) => [...prev, doctorToAdd]);
+        toast({
+            title: "Doctor Agregado",
+            description: `El/La Dr(a). ${newDoctor.name} ha sido añadido exitosamente.`,
+            className: "bg-green-500 text-white",
+        });
+        resetForm();
+        setIsSheetOpen(false);
+    }
   };
 
   const handleDeleteDoctor = (id: string) => {
@@ -143,6 +157,14 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
                 {doctor.specialtyId && <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /><strong>Cédula Esp:</strong> {doctor.specialtyId}</p>}
                 <p className="flex items-center gap-2"><Phone className="w-4 h-4 text-primary" /><strong>Teléfono:</strong> {doctor.phone}</p>
                 <p className="flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /><strong>Email:</strong> {doctor.email}</p>
+                 {doctor.signatureUrl && (
+                  <div className="sm:col-span-2">
+                    <p className="font-semibold mb-2">Firma:</p>
+                    <div className="bg-white border rounded-md p-2 flex justify-center">
+                       <Image src={doctor.signatureUrl} alt={`Firma de ${doctor.name}`} width={200} height={100} objectFit="contain" />
+                    </div>
+                  </div>
+                )}
                 <div className="sm:col-span-2 flex justify-end pt-4">
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteDoctor(doctor.id)}><Trash2 className="mr-2 h-4 w-4"/>Eliminar Doctor</Button>
                 </div>
@@ -231,33 +253,18 @@ export function DoctorsSection({ doctors, setDoctors }: DoctorsSectionProps) {
                 </div>
                  <div className="grid gap-2">
                     <Label>Firma del Doctor</Label>
-                     <div
-                        className="relative w-full h-32 rounded-md border-2 border-dashed flex items-center justify-center cursor-pointer hover:border-primary transition-colors group bg-secondary/50"
-                        onClick={() => signatureFileInputRef.current?.click()}
-                      >
-                        {signaturePreview ? (
-                          <Image
-                            src={signaturePreview}
-                            alt="Signature Preview"
-                            layout="fill"
-                            objectFit="contain"
-                            className="rounded-md p-2"
-                          />
-                        ) : (
-                          <div className="text-center text-muted-foreground p-4">
-                            <Upload className="mx-auto h-8 w-8 mb-2 text-gray-400" />
-                            <p className="mt-2 text-sm font-medium">Subir firma</p>
-                            <p className="mt-1 text-xs">PNG transparente recomendado</p>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          ref={signatureFileInputRef}
-                          onChange={handleSignatureChange}
-                          className="hidden"
-                          accept="image/*"
+                     <div className="relative w-full h-40 rounded-md border bg-background">
+                       <SignatureCanvas
+                          ref={sigCanvas}
+                          penColor='black'
+                          canvasProps={{ className: 'w-full h-full rounded-md' }}
+                          onEnd={handleSaveSignature}
                         />
-                      </div>
+                     </div>
+                      <Button type="button" variant="outline" size="sm" onClick={clearSignature} className="self-start">
+                        <Eraser className="mr-2 h-4 w-4" />
+                        Limpiar Firma
+                      </Button>
                 </div>
               </div>
               <SheetFooter className="pt-4">
