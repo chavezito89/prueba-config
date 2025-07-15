@@ -10,16 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, UserCircle } from "lucide-react";
 
-const ToothIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    {...props}
-  >
-    <path d="M19.95,9.58C19.86,8.8,19.2,8.23,18.43,8.23H17.2V6.32C17.2,4.49,15.71,3,13.88,3H10.12C8.29,3,6.8,4.49,6.8,6.32V8.23H5.57C4.8,8.23,4.14,8.8,4.05,9.58L3,21H21L19.95,9.58ZM8.4,6.32C8.4,5.38,9.17,4.6,10.12,4.6H13.88C14.83,4.6,15.6,5.38,15.6,6.32V8.23H8.4V6.32Z" />
-  </svg>
-);
+const GearIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      {...props}
+    >
+      <path d="M12,8a4,4,0,0,0-4,4,4,4,0,0,0,4,4,4,4,0,0,0,4-4A4,4,0,0,0,12,8Zm0,6a2,2,0,0,1-2-2,2,2,0,0,1,2-2,2,2,0,0,1,2,2A2,2,0,0,1,12,14Zm6.7-3.13.54-1.35a.5.5,0,0,0-.23-.65l-1.54-1a.5.5,0,0,0-.65.23l-.54,1.35a5,5,0,0,0-1.8.76l-1.1-1.1a.5.5,0,0,0-.71,0l-1.1,1.1a.5.5,0,0,0,0,.71l1.1,1.1a5,5,0,0,0-.76,1.8l-1.35.54a.5.5,0,0,0-.23.65l1,1.54a.5.5,0,0,0,.65.23l1.35-.54a5,5,0,0,0,1.8.76l1.1,1.1a.5.5,0,0,0,.71,0l1.1-1.1a.5.5,0,0,0,0-.71l-1.1-1.1a5,5,0,0,0,.76-1.8Zm-2.33,2a3.47,3.47,0,0,1-4.74,0,3.47,3.47,0,0,1,0-4.74,3.47,3.47,0,0,1,4.74,0A3.47,3.47,0,0,1,16.37,12.87Z" />
+    </svg>
+  );
 
 
 const initialClinicInfo: ClinicInfo = {
@@ -42,9 +42,9 @@ export default function DentalConfigPage() {
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <ToothIcon className="h-5 w-5" />
+            <GearIcon className="h-5 w-5" />
           </div>
-          <h1 className="text-xl font-semibold text-foreground">DentalFlow</h1>
+          <h1 className="text-xl font-semibold text-foreground">Configuración</h1>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon">
