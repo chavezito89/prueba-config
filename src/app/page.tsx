@@ -42,7 +42,7 @@ export default function DentalConfigPage() {
   const [doctors, setDoctors] = React.useState<Doctor[]>(initialDoctors);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col bg-background">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -63,14 +63,14 @@ export default function DentalConfigPage() {
       </header>
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <Tabs defaultValue="clinic" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 md:max-w-md mx-auto h-12 mb-8">
-            <TabsTrigger value="clinic" className="text-base">
+          <TabsList className="mb-8 flex w-full max-w-lg mx-auto border-b border-border">
+            <TabsTrigger value="clinic">
               Información de la Clínica
             </TabsTrigger>
-            <TabsTrigger value="doctors" className="text-base">
+            <TabsTrigger value="doctors">
               Gestión de Doctores
             </TabsTrigger>
-            <TabsTrigger value="other" className="text-base">
+            <TabsTrigger value="other">
               Otras Configuraciones
             </TabsTrigger>
           </TabsList>
